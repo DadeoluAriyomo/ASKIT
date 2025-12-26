@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASKIT - AI Question Answering</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-content">
+          <div>
+            <h1>ASKIT</h1>
+            <p>AI-Powered Question Answering</p>
+          </div>
+          <button id="theme-toggle" class="theme-toggle" title="Toggle dark/light mode">🌙</button>
+        </div>
+      </header>
+
+      <main>
+        <div class="card">
+          <div class="form-group">
+            <label for="question">Enter Your Question:</label>
+            <textarea
+              id="question"
+              placeholder="Type your question here..."
+              rows="4"
+            ></textarea>
+          </div>
+
+          <button id="ask-btn" class="btn-primary">Ask AI</button>
+
+          <div id="loader" class="loader hidden"></div>
+
+          <div id="result" class="result-box hidden">
+            <div class="result-section">
+              <h3>Answer:</h3>
+              <div id="answer" class="answer-box"></div>
+            </div>
+          </div>
+
+          <div id="error" class="error-box hidden"></div>
+        </div>
+      </main>
+
+      <footer>
+        <p>&copy; 2025 ASKIT by DADEOLU ARIYOMO. Powered by Gemini LLM</p>
+      </footer>
+    </div>
+
+    <script>
+      // Theme toggle functionality
+      const themeToggle = document.getElementById("theme-toggle");
+      const htmlElement = document.documentElement;
+      
+      // Load saved theme preference
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      htmlElement.setAttribute("data-theme", savedTheme);
+      themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+      
+      // Toggle theme on button click
+      themeToggle.addEventListener("click", () => {
+        const currentTheme = htmlElement.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        htmlElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        themeToggle.textContent = newTheme === "dark" ? "☀️" : "🌙";
+      });
+
+      const btn = document.getElementById("ask-btn");
+      const questionInput = document.getElementById("question");
+      const resultBox = document.getElementById("result");
+      const errorBox = document.getElementById("error");
+      const loader = document.getElementById("loader");
+      const answerBox = document.getElementById("answer");
+
+      btn.addEventListener("click", async () => {
+        const question = questionInput.value.trim();
+        if (!question) {
+          errorBox.textContent = "Please enter a question.";
+          errorBox.classList.remove("hidden");
+          return;
+        }
+
+        // Reset UI
+        resultBox.classList.add("hidden");
+        errorBox.classList.add("hidden");
+        answerBox.textContent = "";
+        loader.classList.remove("hidden");
+
+        try {
+          const res = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question }),
+          });
+
+          const data = await res.json();
+          loader.classList.add("hidden");
+
+          if (data.ok) {
+            // Display results
+            answerBox.textContent = data.answer;
+            resultBox.classList.remove("hidden");
+            resultBox.classList.add("fade-in");
+          } else {
+            errorBox.textContent =
+              "Error: " + (data.error || "Unknown error occurred.");
+            errorBox.classList.remove("hidden");
+          }
+        } catch (err) {
+          loader.classList.add("hidden");
+          errorBox.textContent = "Network error. Please try again.";
+          errorBox.classList.remove("hidden");
+        }
+      });
+
+      // Allow Enter key to submit
+      questionInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" && e.ctrlKey) {
+          btn.click();
+        }
+      });
+    </script>
+  </body>
+</html>

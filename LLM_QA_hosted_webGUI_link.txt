@@ -1,0 +1,16 @@
+Project Overview:
+- CLI Application: LLM_QA_CLI.py (accepts questions, preprocesses text, calls LLM API)
+- Web GUI: Flask application with HTML/CSS frontend
+- Text Preprocessing: Lowercasing, punctuation removal, tokenization
+- LLM Integration: Google Gemini API (with fallback support for OpenAI, Cohere, Groq)
+- Database: SQLite for query logging
+
+Files Included:
+- LLM_QA_CLI.py - Command-line interface
+- app.py - Flask web server
+- requirements.txt - Python dependencies
+- /templates/index.html - Web GUI frontend
+- /static/style.css - Styling
+- LLM_QA_hosted_webGUI_link.txt - This file
+
+
